@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Recharge</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: #fafafa;
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0;
+      color: #222;
+    }
+    .header {
+      background: #fff;
+      padding: 16px 0 8px 0;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.2em;
+      box-shadow: 0 1px 4px #0001;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .safe-pay {
+      color: #00c292;
+      background: #eafaf6;
+      font-size: 0.95em;
+      padding: 4px 0;
+      text-align: center;
+      font-weight: 500;
+    }
+    .profile-box {
+      background: #fff;
+      border-radius: 12px;
+      margin: 16px 12px 0 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    .profile-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #e3e3e3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      color: #fff;
+      font-weight: 700;
+      overflow: hidden;
+    }
+    .profile-info { flex: 1; }
+    .profile-info .name { font-weight: 700; font-size: 1.08em; }
+    .profile-info .desc { color: #888; font-size: 0.95em; margin-top: 2px; }
+    .profile-info .code { color: #ffb800; font-size: 1em; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+    .profile-info .code img { width: 18px; height: 18px; vertical-align: middle; }
+    .section {
+      background: #fff;
+      border-radius: 12px;
+      margin: 16px 12px 0 12px;
+      padding: 1px 12px 12px 12px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    .section-title { font-weight: 700; font-size: 1.08em; margin-bottom: 2px; }
+    .section-desc { color: #ff0050; font-size: 0.98em; margin-bottom: 12px; }
+    .coin-packs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .coin-pack {
+      background: #fff;
+      border: 2px solid #eee;
+      border-radius: 12px;
+      padding: 14px 0 8px 0;
+      text-align: center;
+      cursor: pointer;
+      transition: border 0.2s, box-shadow 0.2s;
+      position: relative;
+      font-size: 1em;
+      min-width: 0;
+    }
+    .coin-pack.selected, .coin-pack:hover { border: 2px solid #ff0050; box-shadow: 0 0 8px #ff005044; }
+    .coin-icon { width: 24px; height: 24px; margin-bottom: 4px; vertical-align: middle; }
+    .coin-amount { font-weight: 700; font-size: 1.1em; margin-bottom: 2px; }
+    .coin-price { color: #888; font-size: 0.98em; }
+    .custom-pack {
+      background: #fff;
+      border: 2px solid #eee;
+      border-radius: 12px;
+      padding: 8px 0 8px 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1em;
+      cursor: pointer;
+      transition: border 0.2s, box-shadow 0.2s;
+      min-width: 0;
+    }
+    .custom-pack.selected, .custom-pack:hover { border: 2px solid #ff0050; box-shadow: 0 0 8px #ff005044; }
+    .custom-input { width: 60px; padding: 4px 8px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 4px; text-align: center; font-size: 1em; }
+    .total-row { margin: 12px 0 8px 0; font-size: 1.08em; color: #222; font-weight: 500; text-align: right; }
+    .invite-row, .add-row {
+      background: #fffbe6; border-radius: 10px; padding: 12px 14px; margin: 12px 0 0 0; display: flex; align-items: center; gap: 10px; font-size: 1em; color: #222; font-weight: 500; cursor: pointer;
+    }
+    .invite-row img, .add-row img { width: 28px; height: 28px; margin-right: 8px; }
+    .invite-row span, .add-row span { color: #888; font-size: 0.95em; margin-left: 4px; }
+    .pay-bar { position: fixed; left: 0; bottom: 0; width: 100vw; background: #fff; box-shadow: 0 -2px 8px #0001; padding: 10px 0 10px 0; text-align: center; z-index: 20; }
+    .pay-btn { background: #ff0050; color: #fff; border: none; border-radius: 24px; padding: 14px 32px; font-size: 1.1em; font-weight: 700; cursor: pointer; margin-top: 8px; transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .pay-btn:hover { background: #e60045; }
+    .pay-btn .shield { width: 22px; height: 22px; vertical-align: middle; }
+    .pay-bar .offer { color: #ff0050; font-size: 0.98em; margin-bottom: 4px; font-weight: 500; }
+    .pay-bar .cards { margin: 6px 0 0 0; display: flex; justify-content: center; gap: 8px; }
+    .pay-bar .cards img { height: 18px; width: auto; }
+    @media (max-width: 600px) {
+      .profile-box, .section { margin: 12px 4px 0 4px; }
+      .coin-packs { grid-template-columns: 1fr 1fr; }
+      .pay-btn { padding: 12px 8vw; font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">Get Coins</div>
+  <div class="profile-box">
+    <div class="profile-avatar">
+      <img src="tiktok.jpg" alt="TikTok Profile" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+    </div>
+    <div class="profile-info" style="display:flex; flex-direction:column; justify-content:center;">
+      <div class="name" style="font-weight: 700; font-size: 1.08em; margin-bottom: 4px;">Recharge</div>
+      <div class="coins" style="display:flex; align-items:center; gap: 4px; color: #888; font-size: 0.95em;">
+        <img src="coin.PNG" alt="Coin" style="width:18px;height:18px;">
+        <span id="balanceCoins">2,251,445,130</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top: 16px;">
+    <div class="section-title"></div>
+    <input type="text" id="username" placeholder="" style="width:calc(100% - 24px);padding:12px;border-radius:8px;border:1px solid #ddd;font-size:1em;margin: 8px 0;">
+  </div>
+  <div class="section">
+    <div class="section-title">Recharge</div>
+    <div class="section-desc">Save around 25% with a lower third-party service fee.</div>
+    <form id="coinForm">
+      <div class="coin-packs" id="coinPacks">
+        <div class="coin-pack" data-amount="70" data-price="0.74">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <img src="coin.PNG" alt="Coin" style="width:32px;height:32px;">
+              <div class="coin-amount" style="font-weight:700;font-size:1.3em;">70</div>
+            </div>
+            <span class="coin-price" style="color:#888; text-align: center; padding-left: 1em;">$0.74</span>
+          </div>
+        </div>
+        <div class="coin-pack" data-amount="350" data-price="3.7">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <img src="coin.PNG" alt="Coin" style="width:32px;height:32px;">
+              <div class="coin-amount" style="font-weight:700;font-size:1.3em;">350</div>
+            </div>
+            <span class="coin-price" style="color:#888; text-align: center; padding-left: 1em;">$3.7</span>
+          </div>
+        </div>
+        <div class="coin-pack" data-amount="700" data-price="7.4">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <img src="coin.PNG" alt="Coin" style="width:32px;height:32px;">
+              <div class="coin-amount" style="font-weight:700;font-size:1.3em;">700</div>
+            </div>
+            <span class="coin-price" style="color:#888; text-align: center; padding-left: 1em;">$7.4</span>
+          </div>
+        </div>
+        <div class="coin-pack" data-amount="1400" data-price="14.8">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <img src="coin.PNG" alt="Coin" style="width:32px;height:32px;">
+              <div class="coin-amount" style="font-weight:700;font-size:1.3em;">1,400</div>
+            </div>
+            <span class="coin-price" style="color:#888; text-align: center; padding-left: 1em;">$14.8</span>
+          </div>
+        </div>
+        <div class="coin-pack" data-amount="3500" data-price="37">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <img src="coin.PNG" alt="Coin" style="width:32px;height:32px;">
+              <div class="coin-amount" style="font-weight:700;font-size:1.3em;">3,500</div>
+            </div>
+            <span class="coin-price" style="color:#888; text-align: center; padding-left: 1em;">$37</span>
+          </div>
+        </div>
+        <div class="coin-pack" data-amount="7000" data-price="74">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <img src="coin.PNG" alt="Coin" style="width:32px;height:32px;">
+              <span class="coin-amount" style="font-weight:700;font-size:1.3em;">7,000</span>
+            </div>
+            <span class="coin-price" style="color:#888; text-align: center; padding-left: 1em;">$74</span>
+          </div>
+        </div>
+        <div class="coin-pack" data-amount="17500" data-price="185">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <img src="coin.PNG" alt="Coin" style="width:32px;height:32px;">
+              <div class="coin-amount" style="font-weight:700;font-size:1.3em;">17,500</div>
+            </div>
+            <span class="coin-price" style="color:#888; text-align: center; padding-left: 1em;">$185</span>
+          </div>
+        </div>
+        <div class="custom-pack" id="customPack">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+            <div class="coin-amount" style="font-weight:700;font-size:1.3em; display:flex; align-items:center; gap:4px;">
+              <img src="coin.PNG" alt="Coin" style="width:32px;height:32px;">
+              Custom
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="payment-methods-image" style="text-align: left; margin-top: 12px; margin-bottom: 12px; padding-left: 20px;">
+        <img src="payment.png" alt="Payment Methods" style="height:32px; width:auto;">
+      </div>
+      <div class="total-row" style="display:flex; align-items:center; justify-content:flex-end; gap: 8px;">
+        <span style="font-weight: 700;">Total</span> <span id="totalPrice" style="font-weight: 700;">$0</span>
+      </div>
+    </form>
+    <div id="result"></div>
+  </div>
+
+  <div class="pay-bar" style="padding: 10px 0; text-align: center;">
+    <button class="pay-btn" id="bottomRechargeBtn" style="background: #ff0050; color: #fff; border: none; border-radius: 12px; padding: 14px 32px; font-size: 1.1em; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; width: calc(100% - 40px); margin: 0 20px;">
+      Recharge
+    </button>
+  </div>
+
+  <!-- Custom Recharge Modal -->
+  <div class="custom-recharge-modal" id="customRechargeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1002;">
+    <div class="modal-content" style="background:#fff; padding:20px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+      <div class="modal-header" style="display:flex; justify-content:center; align-items:center; margin-bottom:20px; position:relative;">
+        <div class="modal-title" style="font-weight:700; font-size:1.2em; text-align:center; flex-grow: 1;">Custom</div>
+        <span class="back-arrow" id="modalBack" style="font-size:1.5em; cursor:pointer; position:absolute; left:0;">&lt;</span>
+        <span class="help-icon" style="font-size:1.2em; cursor:pointer; position:absolute; right:0;">?</span>
+      </div>
+      <div class="modal-body">
+        <div class="input-label" style="font-size:0.9em; color:#888; margin-bottom:8px;">Number of Coins</div>
+        <div class="custom-input-display" style="display:flex; align-items:center; justify-content:flex-start; border:1px solid #eee; border-radius:8px; padding:10px; margin-bottom:20px; padding-left: 20px;">
+          <img src="coin.PNG" alt="Coin" style="width:32px;height:32px; margin-right:8px;">
+          <span id="customModalAmount" style="font-size:1.5em; font-weight:700; color:#333;">0</span>
+        </div>
+        <div class="keypad" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;">
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">1</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">2</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">3</div>
+          <div class="key delete-key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">&#x232B;</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">4</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">5</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">6</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">000</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">7</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">8</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">9</div>
+          <div class="key" style="background:#f0f0f0; padding:15px; border-radius:8px; text-align:center; font-size:1.2em; font-weight:600; cursor:pointer;">0</div>
+        </div>
+      </div>
+      <div class="modal-footer" style="margin-top:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <span style="font-weight:700;">Total</span>
+          <span id="modalTotalPrice" style="font-weight:700; color:#000;">$0</span>
+        </div>
+        <button class="pay-btn" id="modalPayBtn" style="width:100%; background:#fe2c55; color:#fff; border:none; border-radius:12px; padding:14px 0; font-size:1.1em; font-weight:700; cursor:pointer; display:flex; justify-content:center; align-items:center;">
+          Recharge
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Summary Modal -->
+  <div class="order-summary-modal" id="orderSummaryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100;">
+    <div class="modal-content" style="background:#fff; padding:20px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+      <div class="modal-header" style="display:flex; justify-content:center; align-items:center; margin-bottom:20px; position:relative;">
+        <div class="modal-title" style="font-weight:700; font-size:1.2em; text-align:center; flex-grow: 1;">Order summary</div>
+        <span class="close-modal" id="closeOrderSummaryModal" style="font-size:1.5em; cursor:pointer; position:absolute; right:0;">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <span>Account</span>
+          <span id="summaryAccount" style="font-weight:700;">@jakeobsidian</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <span id="summaryCoins">9,900,000 Coins</span>
+          <span id="summaryCoinPrice" style="font-weight:700;">$ 104657.14</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px; border-top:1px solid #eee; padding-top:10px;">
+          <span>Total</span>
+          <span id="summaryTotal" style="font-weight:700; color:#ff0050;">$ 104657.14</span>
+        </div>
+        <div style="margin-bottom:20px;">
+          <span style="font-weight:700;">VISA</span> <span id="summaryPaymentMethod">******6422</span>
+        </div>
+        <p style="font-size:0.8em; color:#888; line-height:1.4;">
+          By clicking "Pay now", you agree to our <a href="#" style="color:#ff0050; text-decoration:none;">Terms of Purchase for Coins</a>. By using any amount of Coins within 14 days after clicking "Pay Now", you acknowledge and confirm that you will no longer be eligible for a refund of this order.
+        </p>
+        <p style="font-size:0.8em; color:#888; line-height:1.4;">
+          To assess your tax rate in accordance with our <a href="#" style="color:#ff0050; text-decoration:none;">Privacy Policy</a>, TikTok detected that your location is New York, New York, New York, United States
+        </p>
+        <button class="pay-btn" id="payNowButton" style="width:100%; margin-top:20px; background:#ff0050; color:#fff; border:none; border-radius:12px; padding:14px 0; font-size:1.1em; font-weight:700; cursor:pointer; display:flex; justify-content:center; align-items:center;">
+          Pay now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yükleniyor Ekranı (gif.gif ile) -->
+  <div id="loadingScreen" style="display:none; position:fixed; inset:0; z-index:1001; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
+    <div class="loading-content" style="background:#fff; border-radius:12px; padding:24px; width:90%; max-width:380px; text-align:center; box-shadow:0 4px 16px rgba(0,0,0,0.25); transform: translateY(-10%);">
+      <img src="gif.gif" alt="Yükleniyor" class="loading-gif" style="width:120px; height:auto; display:block; margin:8px auto 16px; object-fit:contain;" />
+      <h3 style="margin:8px 0 6px; font-size:1.1em; color:#333;">Processing your payment</h3>
+      <p style="margin:0 0 10px; font-size:1.3em; color:#bbbbbbd3;">This could few seconds</p>
+      <div id="countdown" style="font-weight:600; font-size:1.2em; color:#888888c4;">05:00</div>
+    </div>
+  </div>
+
+  <!-- Success Popup Modal -->
+  <div id="successPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 1000;">
+    <div style="background-color: #fff; padding: 28px 24px; border-radius: 18px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.16); max-width: 360px; width: 90%; position: relative;">
+      <div style="background-color: #22c55e; border-radius: 50%; width: 72px; height: 72px; display: flex; justify-content: center; align-items: center; margin: 0 auto 18px;">
+        <span style="color: white; font-size: 40px; line-height: 1;">&#10003;</span>
+      </div>
+      <h3 style="margin: 0 0 8px; color: #111; font-size: 20px; font-weight: 700;">Payment Completed</h3>
+      <p id="successMessage" style="font-size: 14px; color: #666; line-height: 1.5; margin: 0 0 16px;"></p>
+      <button id="successGoBackBtn" style="background-color: #fe2c55; color: #fff; border: none; padding: 12px 18px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 700; width: 100%; box-shadow: 0 4px 10px rgba(254,44,85,0.35);">Go back</button>
+    </div>
+  </div>
+
+  <script>
+    let selectedAmount = 70;
+    let selectedPrice = 0.74;
+    let pricePerCoin = 0; // will be calculated
+    let currentCustomAmount = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const coinPacks = document.querySelectorAll('.coin-pack');
+      const totalPriceSpan = document.getElementById('totalPrice');
+      const bottomRechargeBtn = document.getElementById('bottomRechargeBtn');
+      const orderSummaryModal = document.getElementById('orderSummaryModal');
+      const closeOrderSummaryModal = document.getElementById('closeOrderSummaryModal');
+      const summaryAccount = document.getElementById('summaryAccount');
+      const summaryCoins = document.getElementById('summaryCoins');
+      const summaryCoinPrice = document.getElementById('summaryCoinPrice');
+      const summaryTotal = document.getElementById('summaryTotal');
+      const usernameInput = document.getElementById('username');
+      const customPackDiv = document.getElementById('customPack');
+      const customRechargeModal = document.getElementById('customRechargeModal');
+      const modalBackBtn = document.getElementById('modalBack');
+      const customModalAmountSpan = document.getElementById('customModalAmount');
+      const keypad = document.querySelector('.keypad');
+      const modalTotalPriceSpan = document.getElementById('modalTotalPrice');
+      const modalPayBtn = document.getElementById('modalPayBtn');
+      const successPopup = document.getElementById('successPopup');
+      const successMessage = document.getElementById('successMessage');
+      const successGoBackBtn = document.getElementById('successGoBackBtn');
+      const payNowButton = document.getElementById('payNowButton');
+      const loadingScreen = document.getElementById('loadingScreen');
+      const countdownElement = document.getElementById('countdown');
+      let countdownInterval = null;
+
+      // Bakiyeyi takip eden alan
+      const balanceSpan = document.getElementById('balanceCoins');
+      let accountBalance = 0;
+      if (balanceSpan) {
+        accountBalance = parseInt((balanceSpan.textContent || '').replace(/[^0-9]/g, ''), 10) || 0;
+        balanceSpan.textContent = accountBalance.toLocaleString();
+      }
+
+      // Güvenli hesaplayıcı (daima pozitif bir değer döner)
+      function getPricePerCoin() {
+        if (pricePerCoin && isFinite(pricePerCoin) && pricePerCoin > 0) return pricePerCoin;
+        if (selectedAmount > 0 && selectedPrice > 0) return selectedPrice / selectedAmount;
+        const firstPack = document.querySelector('.coin-pack');
+        if (firstPack) {
+          const a = parseInt(firstPack.dataset.amount);
+          const p = parseFloat(firstPack.dataset.price);
+          if (a > 0 && p > 0) return p / a;
+        }
+        return 0.01; // güvenli varsayılan
+      }
+
+      // İlk hesaplama (güvenli)
+      (function initPricePerCoin() {
+        const firstPack = document.querySelector('.coin-pack');
+        if (firstPack) {
+          const a = parseInt(firstPack.dataset.amount);
+          const p = parseFloat(firstPack.dataset.price);
+          if (a > 0 && p > 0) {
+            pricePerCoin = p / a;
+          }
+        } else if (selectedAmount > 0 && selectedPrice > 0) {
+          pricePerCoin = selectedPrice / selectedAmount;
+        }
+      })();
+
+      // İlk toplam ve buton metni
+      totalPriceSpan.textContent = `$${selectedPrice.toFixed(2)}`;
+      if (bottomRechargeBtn) bottomRechargeBtn.textContent = `Recharge $${selectedPrice.toFixed(2)}`;
+
+      // Paket seçimleri
+      coinPacks.forEach(pack => {
+        pack.addEventListener('click', () => {
+          coinPacks.forEach(p => p.classList.remove('selected'));
+          pack.classList.add('selected');
+
+          selectedAmount = parseInt(pack.dataset.amount);
+          selectedPrice = parseFloat(pack.dataset.price);
+          pricePerCoin = selectedAmount > 0 ? (selectedPrice / selectedAmount) : getPricePerCoin();
+
+          totalPriceSpan.textContent = `$${selectedPrice.toFixed(2)}`;
+          bottomRechargeBtn.textContent = `Recharge $${selectedPrice.toFixed(2)}`;
+        });
+      });
+
+      // Alt çubuktan sipariş özeti
+      bottomRechargeBtn.addEventListener('click', () => {
+        summaryAccount.textContent = usernameInput.value || '@jakeobsidian';
+        summaryCoins.textContent = `${selectedAmount.toLocaleString()} Coins`;
+        summaryCoinPrice.textContent = `$${selectedPrice.toFixed(2)}`;
+        summaryTotal.textContent = `$${selectedPrice.toFixed(2)}`;
+        orderSummaryModal.style.display = 'flex';
+      });
+
+      closeOrderSummaryModal.addEventListener('click', () => {
+        orderSummaryModal.style.display = 'none';
+      });
+
+      // Geri sayım fonksiyonu
+      function startCountdown(duration) {
+        let timer = duration;
+        clearInterval(countdownInterval);
+        if (countdownElement) countdownElement.textContent = '05:00';
+
+        countdownInterval = setInterval(() => {
+          const m = Math.floor(timer / 60);
+          const s = timer % 60;
+          const minutes = String(m).padStart(2, '0');
+          const seconds = String(s).padStart(2, '0');
+
+          if (countdownElement) countdownElement.textContent = `${minutes}:${seconds}`;
+
+          if (timer <= 297) {
+            clearInterval(countdownInterval);
+            loadingScreen.style.display = 'none';
+            if (successMessage) {
+              const coinsText = Number(selectedAmount || 0).toLocaleString();
+              successMessage.textContent = `You recharged ${coinsText} Coins. You can use Coins to send virtual Gifts.`;
+            }
+
+            // İşlem tamamlanınca bakiye düş
+            if (balanceSpan) {
+              accountBalance = Math.max(0, (accountBalance || 0) - (selectedAmount || 0));
+              balanceSpan.textContent = accountBalance.toLocaleString();
+            }
+
+            successPopup.style.display = 'flex';
+            return;
+          }
+
+          timer--;
+        }, 1000);
+      }
+
+      // Order summary modalındaki Pay now
+      payNowButton.addEventListener('click', () => {
+        orderSummaryModal.style.display = 'none';
+        loadingScreen.style.display = 'flex';
+        startCountdown(5 * 60);
+      });
+
+      // Custom modal açılışı
+      customPackDiv.addEventListener('click', () => {
+        customRechargeModal.style.display = 'flex';
+        orderSummaryModal.style.display = 'none';
+        currentCustomAmount = '';
+        customModalAmountSpan.textContent = '0';
+        modalTotalPriceSpan.textContent = '$0';
+      });
+
+      modalBackBtn.addEventListener('click', () => {
+        customRechargeModal.style.display = 'none';
+      });
+
+      // Custom keypad
+      keypad.addEventListener('click', (event) => {
+        const clickedKey = event.target;
+        if (clickedKey.classList.contains('key')) {
+          const keyValue = clickedKey.textContent;
+
+          if (clickedKey.classList.contains('delete-key')) {
+            currentCustomAmount = currentCustomAmount.slice(0, -1);
+          } else if (keyValue === '000') {
+            currentCustomAmount += '000';
+          } else {
+            currentCustomAmount += keyValue;
+          }
+
+          if (currentCustomAmount.length > 7) {
+            currentCustomAmount = currentCustomAmount.slice(0, 7);
+          }
+
+          if (currentCustomAmount === '') {
+            customModalAmountSpan.textContent = '0';
+            modalTotalPriceSpan.textContent = '$0';
+          } else {
+            const amount = parseInt(currentCustomAmount);
+            customModalAmountSpan.textContent = amount.toLocaleString();
+            const ppc = getPricePerCoin();
+            const price = (amount * ppc).toFixed(2);
+            modalTotalPriceSpan.textContent = `$${price}`;
+          }
+        }
+      });
+
+      // Custom modal - Recharge butonu
+      modalPayBtn.addEventListener('click', () => {
+        const finalAmount = parseInt(currentCustomAmount || '0') || 0;
+        const ppc = getPricePerCoin();
+        const finalPrice = (finalAmount * ppc).toFixed(2);
+
+        // Custom ödeme akışı için global seçimi güncelle
+        selectedAmount = finalAmount;
+        selectedPrice = parseFloat(finalPrice);
+        pricePerCoin = ppc;
+
+        summaryAccount.textContent = usernameInput.value || '@jakeobsidian';
+        summaryCoins.textContent = `${finalAmount.toLocaleString()} Coins`;
+        summaryCoinPrice.textContent = `$${finalPrice}`;
+        summaryTotal.textContent = `$${finalPrice}`;
+
+        customRechargeModal.style.display = 'none';
+        orderSummaryModal.style.display = 'flex';
+      });
+
+      successGoBackBtn.addEventListener('click', () => {
+        successPopup.style.display = 'none';
+      });
+
+      // Modal dışına tıklayınca kapat
+      window.addEventListener('click', (event) => {
+        if (event.target === orderSummaryModal) {
+          orderSummaryModal.style.display = 'none';
+        }
+        if (event.target === customRechargeModal) {
+          customRechargeModal.style.display = 'none';
+        }
+        if (event.target === successPopup) {
+          successPopup.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+ 
